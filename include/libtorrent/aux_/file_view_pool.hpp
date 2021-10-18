@@ -110,6 +110,10 @@ namespace aux {
 
 		void close_oldest();
 
+#if TORRENT_HAVE_MAP_VIEW_OF_FILE
+		void flush_next_file();
+#endif
+
 	private:
 
 		std::shared_ptr<file_mapping> remove_oldest(std::unique_lock<std::mutex>&);
@@ -150,6 +154,10 @@ namespace aux {
 			mi::ordered_unique<mi::member<file_entry, file_id, &file_entry::key>>,
 			// look up files by least recently used
 			mi::sequenced<>
+#if TORRENT_HAVE_MAP_VIEW_OF_FILE
+			// look up files by least recently flushed
+			, mi::sequenced<>
+#endif
 			>
 		>;
 

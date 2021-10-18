@@ -269,6 +269,18 @@ namespace libtorrent { namespace aux {
 		std::unique_lock<std::mutex> l(m_mutex);
 		deferred_destruction = remove_oldest(l);
 	}
+
+#if TORRENT_HAVE_MAP_VIEW_OF_FILE
+	void file_view_pool::flush_next_file()
+	{
+		std::unique_lock<std::mutex> l(m_mutex);
+		auto& flush_view = m_files.get<2>();
+		if (flush_view.size() == 0) return;
+
+		flush_view.begin()->mapping->flush();
+		flush_view.relocate(m_files.project<2>(flush_view.begin()), flush_view.end());
+	}
+#endif
 }
 }
 
